@@ -29,7 +29,7 @@ Loop:
   for {
     select {
     case msg := <-rtm.IncomingEvents:
-      fmt.Print("Event Received: ")
+      fmt.Printf("Event Received: %+v\n", msg)
       switch ev := msg.Data.(type) {
 
       case *slack.MessageEvent:
@@ -57,7 +57,16 @@ Loop:
         }
 
         if ev.User != info.User.ID {
-          rtm.SendMessage(rtm.NewOutgoingMessage(response, ev.Channel))
+          if len(response) > 4000{
+            for len(response) > 3000{
+              this_message := response[:3000]
+              response = response[3000:]
+              rtm.SendMessage(rtm.NewOutgoingMessage(this_message, ev.Channel))
+            }
+            rtm.SendMessage(rtm.NewOutgoingMessage(response, ev.Channel))
+          } else {
+            rtm.SendMessage(rtm.NewOutgoingMessage(response, ev.Channel))
+          }
         }
 
       case *slack.RTMError:
