@@ -3,8 +3,9 @@ package main
 import (
   "fmt"
   "os"
-  "regexp"
   "strings"
+  "runtime"
+  "time"
 
   "github.com/nlopes/slack"
 )
@@ -18,6 +19,7 @@ func getenv(name string) string {
 }
 
 func main() {
+  startTime := time.Now()
   token := getenv("SLACKTOKEN")
   api := slack.New(token)
   rtm := api.NewRTM()
@@ -36,11 +38,21 @@ Loop:
         text := ev.Text
         text = strings.TrimSpace(text)
         text = strings.ToLower(text)
+        var response string
 
-        matched, _ := regexp.MatchString("dark souls", text)
+        switch text {
+        case "os":
+          response = runtime.GOOS
+        case "arch":
+          response = runtime.GOARCH
+        case "uptime":
+          response = time.Since(startTime).String()
+        default:
+          response = "Unknown command: " + text
+        }
 
-        if ev.User != info.User.ID && matched {
-          rtm.SendMessage(rtm.NewOutgoingMessage("\\[T]/ Praise the Sun \\[T]/", ev.Channel))
+        if ev.User != info.User.ID {
+          rtm.SendMessage(rtm.NewOutgoingMessage(response, ev.Channel))
         }
 
       case *slack.RTMError:
