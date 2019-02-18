@@ -47,6 +47,11 @@ Loop:
           response = runtime.GOARCH
         case "uptime":
           response = time.Since(startTime).String()
+        case "env":
+          environ := os.Environ()
+          response = strings.Join(environ, "\n")
+        case "help":
+          response = "Accepted Commands:\n \tos : Prints runtime.GOOS\n\tarch : Prints runtime.GOARCH\n\tuptime : prints application uptime\n\tenv : prints environment variables\n\thelp : prints this message"
         default:
           response = "Unknown command: " + text
         }
