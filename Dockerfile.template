@@ -1,0 +1,11 @@
+# base-image for golang on any machine using a template var
+FROM resin/%%RESIN_MACHINE_NAME%%-golang:latest
+
+# enable systemd
+ENV INITSYSTEM on
+
+COPY ./ /usr/src/slack_ping_pong
+
+RUN go get /usr/src/slack_ping_pong
+
+CMD ["./bin/slack_ping_pong"]
